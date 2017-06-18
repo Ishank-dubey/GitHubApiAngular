@@ -8,6 +8,8 @@
 	function routeFunction($routeProvider){
 		$routeProvider.when('/home',{
 			template : '<system-home></system-home>'
+		}).when('/top',{
+			template : '<top-results></top-results>'
 		}).otherwise({
 			redirectTo : '/home'
 		});

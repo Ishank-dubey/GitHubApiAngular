@@ -1,4 +1,4 @@
 (function(){
 	'use strict'
-	angular.module('CoP',['ngRoute', 'systemHome']);
+	angular.module('CoP',['ngRoute', 'systemHome','topResults']);
 })();

@@ -1,7 +1,7 @@
 {
-  "name": "CrossOver",
+  "name": "RG",
   "version": "0.0.1",
-  "description": "CrossOver Project",
+  "description": "RG",
   "main": "app.js",
   "scripts": {
     "postinstall": "bower install",

@@ -6,141 +6,124 @@
 		    controller :   Module1Component,
 		    controllerAs : 'aM1Ctrl'
 			});
-	Module1Component.$inject = ['$scope','$http','$rootScope', '$timeout'];
-	function Module1Component($scope, $http, $rootScope, $timeout){
-		var aM1Ctrl = this;
+	Module1Component.$inject = ['$scope','$http','$rootScope', '$timeout','$location'];
+	function Module1Component($scope, $http, $rootScope, $timeout,$location){
 		
-		 aM1Ctrl.titleType = "Changelist / Build";
-		 aM1Ctrl.titleOwner= "Owner";
-		 aM1Ctrl.titleTimeStarted = "Time Started";
-		 aM1Ctrl.titleState = "State";
-		 aM1Ctrl.titleMetrics= "Metrics";
-		 aM1Ctrl.titleBuild = "Build";
-		 aM1Ctrl.titleUnitTest = "Unit Test";
-		 aM1Ctrl.titleFunctionalTest = "Functional Test";
-		 //Test egit
-		 
-		 $rootScope.previousExpandedRow = "";
-		 
-		 $scope.$watch(function(){
-			 return aM1Ctrl.details;
-		 },function(aNewValue, anOldValue){
-			 if(aNewValue){
-			 aM1Ctrl.clickMethod = function clickMethod($event){
-	    		 var aClickedRow = $event.currentTarget,
-	    		 aTitle = $event.currentTarget.querySelector('span').innerHTML,
-	    		 anIdSelectedRow = $event.currentTarget.getAttribute("id"),
-	    		 aCurrentRow = document.getElementById(anIdSelectedRow),
-	    		 aPreviousRow, theImageElements, aRemovedContainer, anIndex, aPreviousCOntainer;
-	    		 /* Reset the past expanded row if any*/
-	    		 if(!$rootScope.previousExpandedRow == ""){
-	    			 aPreviousRow = document.getElementById($rootScope.previousExpandedRow);
-	    			 theImageElements = aPreviousRow.getElementsByTagName("img");
-	    			 for(anIndex in theImageElements){
-	    				 
-	    				 if(anIndex!=0 && theImageElements.hasOwnProperty(anIndex)){
-	    					 theImageElements[anIndex].style.visibility = "";
-	    				 }
-	    			 }
-	    			 aPreviousCOntainer = aPreviousRow.getElementsByClassName("expanded_container");
-	    			 if(aPreviousRow && aPreviousCOntainer[0]){
-	    			 aRemovedContainer = aPreviousRow.removeChild(aPreviousCOntainer[0]);
-	    			 aPreviousRow.style.height = "45px";
-	    			 }
-	    		 }
-	    		 
-	    		 /*Add detail view div*/
-	    		  theImageElements = aCurrentRow.getElementsByTagName("img");
-	    		 
-	    		 for(anIndex in theImageElements){
-    				 if(anIndex!=0 && theImageElements.hasOwnProperty(anIndex)){
-    					 theImageElements[anIndex].style.visibility = "hidden";
-    				 }
-    			 }
-	    		 
-	    		 aCurrentRow.style.height = "245px";
-	    		 
-	    		 aM1Ctrl.detailViewBuildMethod = function detailViewMethod($event){
-	    				$event.stopPropagation();
-	    				}
-	    		 
-	    		 /*Fetch the data corresponding to the row clicked*/
-	    		 $http.get("Resources/"+aTitle+".json")
-	    		    .then(function (response) {
-	    		    	var aData = response.data, anIndex, aStatus;
-	    		    	
-	    		    	/*Populate the expanded view with the data fetched*/
-	    		    	for(anIndex in aData){
-	    		    		if(aData.hasOwnProperty(anIndex)){
-	    		    			if(anIndex.toLowerCase() == "metrics"){
-	    		    				aM1Ctrl.test = aData[anIndex].test;
-	    		    				aM1Ctrl.metricsDetailStatus = aData[anIndex].metricsDetailStatus;
-	    		    			}	else if(anIndex.toLowerCase() == "build"){
-	    		    				aM1Ctrl.time = aData[anIndex].time;
-	    		    				aM1Ctrl.buildDetailStatus = aData[anIndex].buildDetailStatus;
-	    		    			}	else if(anIndex.toLowerCase() == "unittest"){
-	    		    				aM1Ctrl.testPassed = aData[anIndex].testPassed;
-	    		    				aM1Ctrl.failed = aData[anIndex].failed;
-	    		    				aM1Ctrl.percentage = aData[anIndex].percentage;
-	    		    				aM1Ctrl.coverage = aData[anIndex].coverage;
-	    		    				aM1Ctrl.unitTestDetailStatus = aData[anIndex].unitTestDetailStatus;
-	    		    			}   else if(anIndex.toLowerCase() == "functionaltest"){
-	    		    				aM1Ctrl.functionalTestDetailStatus = aData[anIndex].functionalTestDetailStatus;
-	    		    				aM1Ctrl.functionalTestPassed = aData[anIndex].functionalTestPassed;
-	    		    				aM1Ctrl.functionalFailed = aData[anIndex].functionalFailed;
-	    		    				aM1Ctrl.functionalPercentage = aData[anIndex].functionalPercentage;
-	    		    				aM1Ctrl.functionalCoverage = aData[anIndex].functionalCoverage;
-	    		    			}   else if(anIndex.toLowerCase() == "result"){
-	    		    				aStatus = aData[anIndex].status;
-	    		    				aM1Ctrl.message = aData[anIndex].message;
-	    		    				aM1Ctrl.buttonMessage = aData[anIndex].buttonMessage;
-	    		    				aM1Ctrl.acceptedOrRejected = aData[anIndex].acceptedOrRejected;
-	    		    				if(aStatus.toLowerCase()=="pending" || aStatus.toLowerCase()=="running"){
-	    		    					aM1Ctrl.cRejected = false;
-	    		    					aM1Ctrl.fontClass = "fontPending";
-		    		    				aM1Ctrl.ahidden = true;
-	    		    				}else if(aStatus.toLowerCase()=="accepted"){
-	    		    					aM1Ctrl.cRejected = false;
-	    		    					aM1Ctrl.ahidden = true;
-	    		    					aM1Ctrl.fontClass = "fontAccepted";
-	    		    				} else if(aStatus.toLowerCase()=="rejected"){
-	    		    					aM1Ctrl.cRejected = false;
-	    		    					aM1Ctrl.ahidden = true;
-	    		    					aM1Ctrl.fontClass = "fontRejected";
-	    		    				} else if(aStatus.toLowerCase()=="complete"){
-	    		    					aM1Ctrl.cRejected = true;
-	    		    					aM1Ctrl.ahidden = false;
-	    		    					aM1Ctrl.fontClass = "fontComplete";
-	    		    				}
-	    		    			}
-	    		    		}
-	    		    		
-	    		    	}
-	    		    	
-	    		    	
-	    		    });
-	    		 
-	    		 /*To match the css animation*/
-	    		 $timeout(function(){
-	    			 if(aRemovedContainer)
-	    				 aCurrentRow.appendChild(aRemovedContainer);
-	    			 else {
-	    				 var aExpansionElement = document.getElementsByClassName("expanded_container")[0];
-	    				 if(aExpansionElement){
-	    				 aExpansionElement.style.display = "";
-	    				 aCurrentRow.appendChild(aExpansionElement);
-	    				 }
-	    				 }
-		    		 $rootScope.previousExpandedRow = anIdSelectedRow;	 
-	    		 },500);
-			 };
+		var aM1Ctrl = this;
+		aM1Ctrl.hidden = true;
+		aM1Ctrl.minWarning = true;
+		
+		if(document && document.getElementById("queryT"))
+		document.getElementById("queryT").focus();
+		
+		aM1Ctrl.mySubmitFunction =function(){
+			
+			aM1Ctrl.oldDate = aM1Ctrl.oldDate || new Date();
+			
+			
+			if((!aM1Ctrl.aQueryFinal) || (aM1Ctrl.aQueryFinal!=aM1Ctrl.aQuery) || 
+					((aM1Ctrl.aQueryFinal && aM1Ctrl.aQueryFinal==aM1Ctrl.aQuery) && (new Date()-aM1Ctrl.oldDate)/1000>60))
+			{
+			aM1Ctrl.hidden = false;
+			aM1Ctrl.message = 'Fetching the List...';	
+			aM1Ctrl.minWarning = true;	
+			aM1Ctrl.aQueryFinal = aM1Ctrl.aQuery;
+			var aUrl = "https://api.github.com/search/repositories?q="+aM1Ctrl.aQueryFinal+"+language:javascript&is=public&sort=stars&order=desc";	
+			 $http.get(aUrl)
+		    .then(aM1Ctrl.myResponseFunction);
+			 aM1Ctrl.oldDate = new Date();
+			 }else{
+				 aM1Ctrl.minWarning = false;
+				 $timeout(function(){aM1Ctrl.minWarning = true;},500);
 			 }
-		 })
+		};
+		
+		aM1Ctrl.myResponseFunction = function(response){
+		   aM1Ctrl.hidden = true;
+		   if(response && response.data && response.data.items)
+		   aM1Ctrl.details = response.data.items;
+		};
+		
+		aM1Ctrl.importFunction = function(index){
+			aM1Ctrl.details[index].imported = true;
+			aM1Ctrl.details = aM1Ctrl.details;
+			
+			aM1Ctrl.hidden = false;
+			aM1Ctrl.message = 'Importing..';
+			
+			if(aM1Ctrl.details[index] && aM1Ctrl.details[index].hasOwnProperty( "contents_url")){
+				var aContentUrl = aM1Ctrl.details[index]["contents_url"].replace("{+path}",'');
+				$http.get(aContentUrl)
+			    .then(aM1Ctrl.myContentResponseFunction);
+			}
+		};
+		
+		aM1Ctrl.myContentResponseFunction = function(contentResponse){
+			var anIndex=0,length, packageUrl='';
+			
+			for(anIndex=0,length=contentResponse.data.length;anIndex<length;anIndex++){
+				if(contentResponse.data[anIndex].hasOwnProperty("name") && 
+						contentResponse.data[anIndex]["name"].toLowerCase()=="package.json"){
+				
+				packageUrl = contentResponse.data[anIndex]["download_url"];	
+				$http.get(packageUrl)
+			    .then(aM1Ctrl.myPackageContentResponseFunction);
+				break;
+				}
+			}
+			
+			if(!packageUrl){
+				aM1Ctrl.message = 'Could not find the details...';
+				$timeout(function(){aM1Ctrl.hidden = true;}, 2000);
+				
+			}
+			
+		};
+		
+		aM1Ctrl.myPackageContentResponseFunction = function(packContent){
+			aM1Ctrl.hidden = true;
+			
+			aM1Ctrl.packageTrack = aM1Ctrl.packageTrack || {};
+			
+			if(packContent.data.hasOwnProperty("dependencies")){
+			var dependencyArrays = 	Object.keys(packContent.data["dependencies"]);
+			var anIndex,length;
+			for(anIndex=0,length=dependencyArrays.length;anIndex<length;anIndex++){
+			        if(aM1Ctrl.packageTrack.hasOwnProperty(dependencyArrays[anIndex])){
+			            var aCount = parseInt(aM1Ctrl.packageTrack[dependencyArrays[anIndex]]);
+			            
+			            aM1Ctrl.packageTrack[dependencyArrays[anIndex]] = ++aCount;
+			            
+			            	
+			        }else{
+			        	aM1Ctrl.packageTrack[dependencyArrays[anIndex]] = 1;
+			        }	
+			}
+			}
+			if(packContent.data.hasOwnProperty("devDependencies")){
+			
+				var devDependencyArrays = Object.keys(packContent.data["devDependencies"]);
+				var anIndex,length;
+				for(anIndex=0,length=devDependencyArrays.length;anIndex<length;anIndex++){
+				        if(aM1Ctrl.packageTrack.hasOwnProperty(devDependencyArrays[anIndex])){
+				            var aCount = parseInt(aM1Ctrl.packageTrack[devDependencyArrays[anIndex]]);
+				            
+				            aM1Ctrl.packageTrack[devDependencyArrays[anIndex]] = ++aCount;
+				            
+				            	
+				        }else{
+				        	aM1Ctrl.packageTrack[devDependencyArrays[anIndex]] = 1;
+				        }	
+				}
+			}
+			$rootScope.packageTrack = aM1Ctrl.packageTrack;
+		}
+		
+		aM1Ctrl.navigateToTopresultsPage = function(){
+			$location.path("/top");
+		}
 		 
-		 $http.get("Resources/Data.json")
-	    .then(function (response) {
-	    	aM1Ctrl.details = response.data;
-	    });
+		 
 	}
 }
 )();
